@@ -10,6 +10,7 @@ import PricingTax from "./wizard/PricingTax";
 import DescriptionMedia from "./wizard/DescriptionMedia";
 import Variants from "./wizard/Variants";
 import SuccessPage from "./wizard/SuccessPage";
+import { productService } from "@/services/productService";
 
 export interface ProductFormData {
   // General Information
@@ -66,6 +67,7 @@ export interface ProductFormData {
 
 const ProductWizard = () => {
   const [currentStep, setCurrentStep] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState<ProductFormData>({
     itemType: "goods",
     productName: "",
@@ -110,9 +112,55 @@ const ProductWizard = () => {
     setFormData(prev => ({ ...prev, ...data }));
   };
 
+  const validateStep = (step: number): boolean => {
+    switch (step) {
+      case 1:
+        if (!formData.productName.trim()) {
+          toast({
+            title: "Validation Error",
+            description: "Product name is required.",
+            variant: "destructive",
+          });
+          return false;
+        }
+        if (!formData.category) {
+          toast({
+            title: "Validation Error",
+            description: "Category is required.",
+            variant: "destructive",
+          });
+          return false;
+        }
+        break;
+      case 2:
+        if (!formData.sellingPrice || parseFloat(formData.sellingPrice) <= 0) {
+          toast({
+            title: "Validation Error",
+            description: "Valid selling price is required.",
+            variant: "destructive",
+          });
+          return false;
+        }
+        break;
+      case 3:
+        if (!formData.description.trim()) {
+          toast({
+            title: "Validation Error",
+            description: "Product description is required.",
+            variant: "destructive",
+          });
+          return false;
+        }
+        break;
+    }
+    return true;
+  };
+
   const handleNext = () => {
-    if (currentStep < 5) {
-      setCurrentStep(currentStep + 1);
+    if (validateStep(currentStep)) {
+      if (currentStep < 4) {
+        setCurrentStep(currentStep + 1);
+      }
     }
   };
 
@@ -122,25 +170,103 @@ const ProductWizard = () => {
     }
   };
 
-  const handleSave = () => {
-    console.log("Saving product:", formData);
-    setCurrentStep(5); // Show success page
-    toast({
-      title: "Product saved successfully!",
-      description: "Your product has been added to the inventory.",
-    });
+  const handleSave = async () => {
+    if (!validateStep(currentStep)) {
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      // Generate SKU if not provided
+      if (!formData.sku) {
+        const generatedSku = productService.generateSKU(formData.category, formData.productName);
+        setFormData(prev => ({ ...prev, sku: generatedSku }));
+      }
+
+      const savedProduct = productService.saveProduct(formData);
+      console.log("Product saved successfully:", savedProduct);
+      
+      setCurrentStep(5); // Show success page
+      toast({
+        title: "Success!",
+        description: "Product has been saved successfully.",
+      });
+    } catch (error) {
+      console.error("Error saving product:", error);
+      toast({
+        title: "Error",
+        description: "Failed to save product. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleSaveAsDraft = () => {
-    console.log("Saving as draft:", formData);
-    toast({
-      title: "Draft saved!",
-      description: "Your product has been saved as a draft.",
+  const handleSaveAsDraft = async () => {
+    setIsLoading(true);
+    try {
+      // In a real app, you might save to a different table or add a status field
+      console.log("Saving as draft:", formData);
+      
+      toast({
+        title: "Draft Saved",
+        description: "Your product has been saved as a draft.",
+      });
+    } catch (error) {
+      console.error("Error saving draft:", error);
+      toast({
+        title: "Error",
+        description: "Failed to save draft. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const resetForm = () => {
+    setFormData({
+      itemType: "goods",
+      productName: "",
+      sku: "",
+      barcode: "",
+      ean: "",
+      category: "",
+      subCategory: "",
+      brand: "",
+      productType: "simple",
+      supplier: "",
+      supplierSku: "",
+      warehouse: "",
+      leadTime: "",
+      reorderLevel: "",
+      initialStock: "",
+      track: "serial",
+      status: "returnable",
+      purchasePrice: "",
+      sellingPrice: "",
+      wholesalePrice: "",
+      quantity: "",
+      unit: "",
+      discountPrice: "",
+      discountPeriod: { from: "", to: "" },
+      taxRate: "",
+      hsnSac: "",
+      priceIncludeGst: false,
+      gstRate: "",
+      description: "",
+      images: [],
+      seoTitle: "",
+      seoDescription: "",
+      keywords: [],
+      variants: []
     });
+    setCurrentStep(1);
   };
 
   if (currentStep === 5) {
-    return <SuccessPage onAddMore={() => setCurrentStep(1)} onGoBack={() => navigate("/")} />;
+    return <SuccessPage onAddMore={resetForm} onGoBack={() => navigate("/")} />;
   }
 
   const renderStepContent = () => {
@@ -171,7 +297,7 @@ const ProductWizard = () => {
             <Button
               variant="outline"
               onClick={handlePrevious}
-              disabled={currentStep === 1}
+              disabled={currentStep === 1 || isLoading}
             >
               Previous
             </Button>
@@ -180,16 +306,25 @@ const ProductWizard = () => {
               <Button
                 variant="outline"
                 onClick={handleSaveAsDraft}
+                disabled={isLoading}
               >
                 Save as draft
               </Button>
               
               {currentStep === 4 ? (
-                <Button onClick={handleSave} className="bg-blue-600 hover:bg-blue-700">
-                  Save
+                <Button 
+                  onClick={handleSave} 
+                  disabled={isLoading}
+                  className="bg-blue-600 hover:bg-blue-700"
+                >
+                  {isLoading ? "Saving..." : "Save"}
                 </Button>
               ) : (
-                <Button onClick={handleNext} className="bg-blue-600 hover:bg-blue-700">
+                <Button 
+                  onClick={handleNext} 
+                  disabled={isLoading}
+                  className="bg-blue-600 hover:bg-blue-700"
+                >
                   Next
                 </Button>
               )}
