@@ -1,4 +1,5 @@
 
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -13,6 +14,10 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Search, Settings, Bell, User, LogOut, Plus } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
+import { useNotifications } from "@/contexts/NotificationContext";
+import NotificationPanel from "./NotificationPanel";
+import SettingsPanel from "./SettingsPanel";
 
 interface HeaderProps {
   title?: string;
@@ -22,7 +27,10 @@ interface HeaderProps {
 
 const Header = ({ title = "Dashboard", showAddButton = true, onAddClick }: HeaderProps) => {
   const navigate = useNavigate();
-  const location = useLocation();
+  const { user, logout } = useAuth();
+  const { unreadCount } = useNotifications();
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
 
   const handleAddProduct = () => {
     if (onAddClick) {
@@ -32,8 +40,13 @@ const Header = ({ title = "Dashboard", showAddButton = true, onAddClick }: Heade
     }
   };
 
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
+  };
+
   return (
-    <div className="bg-white border-b border-gray-200 px-6 py-4">
+    <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-4">
       <div className="flex items-center justify-between">
         {/* Left Side - Logo and Title */}
         <div className="flex items-center gap-6">
@@ -41,7 +54,7 @@ const Header = ({ title = "Dashboard", showAddButton = true, onAddClick }: Heade
             <div className="bg-blue-600 text-white px-3 py-1 rounded-md font-bold text-lg">
               MUN-C
             </div>
-            <h1 className="text-xl font-semibold text-gray-900 hidden sm:block">
+            <h1 className="text-xl font-semibold text-gray-900 dark:text-white hidden sm:block">
               {title}
             </h1>
           </div>
@@ -53,7 +66,7 @@ const Header = ({ title = "Dashboard", showAddButton = true, onAddClick }: Heade
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
             <Input
               placeholder="Search..."
-              className="pl-10 bg-gray-50 border-gray-200"
+              className="pl-10 bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600"
             />
           </div>
         </div>
@@ -71,36 +84,65 @@ const Header = ({ title = "Dashboard", showAddButton = true, onAddClick }: Heade
           )}
 
           {/* Notifications */}
-          <Button variant="ghost" size="icon" className="relative">
-            <Bell className="w-5 h-5" />
-            <Badge className="absolute -top-1 -right-1 w-5 h-5 flex items-center justify-center p-0 bg-red-500 text-white text-xs">
-              3
-            </Badge>
-          </Button>
+          <div className="relative">
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="relative"
+              onClick={() => {
+                setShowNotifications(!showNotifications);
+                setShowSettings(false);
+              }}
+            >
+              <Bell className="w-5 h-5" />
+              {unreadCount > 0 && (
+                <Badge className="absolute -top-1 -right-1 w-5 h-5 flex items-center justify-center p-0 bg-red-500 text-white text-xs">
+                  {unreadCount}
+                </Badge>
+              )}
+            </Button>
+            <NotificationPanel 
+              isOpen={showNotifications} 
+              onClose={() => setShowNotifications(false)} 
+            />
+          </div>
 
           {/* Settings */}
-          <Button variant="ghost" size="icon">
-            <Settings className="w-5 h-5" />
-          </Button>
+          <div className="relative">
+            <Button 
+              variant="ghost" 
+              size="icon"
+              onClick={() => {
+                setShowSettings(!showSettings);
+                setShowNotifications(false);
+              }}
+            >
+              <Settings className="w-5 h-5" />
+            </Button>
+            <SettingsPanel 
+              isOpen={showSettings} 
+              onClose={() => setShowSettings(false)} 
+            />
+          </div>
 
           {/* User Profile Dropdown */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="relative h-10 w-10 rounded-full">
                 <Avatar className="h-10 w-10">
-                  <AvatarImage src="/placeholder-user.jpg" alt="User" />
+                  <AvatarImage src={user?.avatar} alt={user?.name} />
                   <AvatarFallback className="bg-blue-600 text-white">
                     <User className="w-5 h-5" />
                   </AvatarFallback>
                 </Avatar>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56 bg-white" align="end" forceMount>
+            <DropdownMenuContent className="w-56 bg-white dark:bg-gray-800" align="end" forceMount>
               <DropdownMenuLabel className="font-normal">
                 <div className="flex flex-col space-y-1">
-                  <p className="text-sm font-medium leading-none">Admin User</p>
+                  <p className="text-sm font-medium leading-none">{user?.name || 'User'}</p>
                   <p className="text-xs leading-none text-muted-foreground">
-                    admin@mun-c.com
+                    {user?.email || 'user@example.com'}
                   </p>
                 </div>
               </DropdownMenuLabel>
@@ -109,12 +151,12 @@ const Header = ({ title = "Dashboard", showAddButton = true, onAddClick }: Heade
                 <User className="mr-2 h-4 w-4" />
                 <span>Profile</span>
               </DropdownMenuItem>
-              <DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setShowSettings(!showSettings)}>
                 <Settings className="mr-2 h-4 w-4" />
                 <span>Settings</span>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>
+              <DropdownMenuItem onClick={handleLogout}>
                 <LogOut className="mr-2 h-4 w-4" />
                 <span>Log out</span>
               </DropdownMenuItem>
