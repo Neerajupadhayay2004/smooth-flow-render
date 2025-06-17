@@ -54,7 +54,7 @@ const Sidebar = () => {
       <Button
         variant="ghost"
         size="icon"
-        className="md:hidden fixed top-4 left-4 z-50"
+        className="md:hidden fixed top-4 left-4 z-50 bg-white dark:bg-gray-800 shadow-md"
         onClick={() => setIsMobileOpen(!isMobileOpen)}
       >
         {isMobileOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -76,18 +76,18 @@ const Sidebar = () => {
         isMobileOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
       )}>
         {/* Logo */}
-        <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+        <div className="p-4 md:p-6 border-b border-gray-200 dark:border-gray-700">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-sm">M</span>
             </div>
             {!isCollapsed && (
-              <span className="font-bold text-xl text-gray-900 dark:text-white">MUN-C</span>
+              <span className="font-bold text-lg md:text-xl text-gray-900 dark:text-white">MUN-C</span>
             )}
           </div>
         </div>
 
-        {/* Collapse Button */}
+        {/* Collapse Button - Hidden on Mobile */}
         <div className="hidden md:block absolute -right-3 top-24">
           <Button
             variant="outline"
@@ -100,13 +100,13 @@ const Sidebar = () => {
         </div>
 
         {/* Navigation */}
-        <nav className="p-4 space-y-2">
+        <nav className="p-3 md:p-4 space-y-2">
           {menuItems.map((item) => (
             <div key={item.label}>
               <Button
                 variant="ghost"
                 className={cn(
-                  "w-full justify-start text-left font-medium",
+                  "w-full justify-start text-left font-medium text-sm md:text-base",
                   isActivePath(item.path) && "bg-blue-50 dark:bg-blue-900/20 text-blue-600",
                   isCollapsed && "px-2"
                 )}
@@ -119,7 +119,7 @@ const Sidebar = () => {
                   }
                 }}
               >
-                <item.icon className="w-4 h-4 mr-3" />
+                <item.icon className="w-4 h-4 mr-3 flex-shrink-0" />
                 {!isCollapsed && (
                   <>
                     {item.label}

@@ -14,6 +14,7 @@ import Stocks from "./pages/Stocks";
 import Sales from "./pages/Sales";
 import Documents from "./pages/Documents";
 import Reports from "./pages/Reports";
+import ReturnAudit from "./pages/ReturnAudit";
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
 
@@ -46,6 +47,7 @@ const AppRoutes = () => {
       <Route path="/sales" element={<ProtectedRoute><Sales /></ProtectedRoute>} />
       <Route path="/documents" element={<ProtectedRoute><Documents /></ProtectedRoute>} />
       <Route path="/reports" element={<ProtectedRoute><Reports /></ProtectedRoute>} />
+      <Route path="/return-audit" element={<ProtectedRoute><ReturnAudit /></ProtectedRoute>} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   );
@@ -60,7 +62,9 @@ const App = () => (
             <Toaster />
             <Sonner />
             <BrowserRouter>
-              <AppRoutes />
+              <div className="w-full">
+                <AppRoutes />
+              </div>
             </BrowserRouter>
           </TooltipProvider>
         </NotificationProvider>
