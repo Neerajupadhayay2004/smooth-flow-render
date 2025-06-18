@@ -11,6 +11,7 @@ interface User {
 interface AuthContextType {
   user: User | null;
   login: (email: string, password: string) => Promise<boolean>;
+  register: (name: string, email: string, password: string) => Promise<boolean>;
   logout: () => void;
   isLoading: boolean;
 }
@@ -35,6 +36,24 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 1000));
     
+    // Check against registered users in localStorage
+    const registeredUsers = JSON.parse(localStorage.getItem('registered-users') || '[]');
+    const foundUser = registeredUsers.find((u: any) => u.email === email && u.password === password);
+    
+    if (foundUser) {
+      const userData = {
+        id: foundUser.id,
+        name: foundUser.name,
+        email: foundUser.email,
+        avatar: foundUser.avatar
+      };
+      setUser(userData);
+      localStorage.setItem('auth-user', JSON.stringify(userData));
+      setIsLoading(false);
+      return true;
+    }
+    
+    // Default admin credentials
     if (email === 'admin@mun-c.com' && password === 'admin123') {
       const userData = {
         id: '1',
@@ -52,13 +71,56 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     return false;
   };
 
+  const register = async (name: string, email: string, password: string): Promise<boolean> => {
+    setIsLoading(true);
+    
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    // Check if user already exists
+    const registeredUsers = JSON.parse(localStorage.getItem('registered-users') || '[]');
+    const existingUser = registeredUsers.find((u: any) => u.email === email);
+    
+    if (existingUser || email === 'admin@mun-c.com') {
+      setIsLoading(false);
+      return false; // User already exists
+    }
+    
+    // Create new user
+    const newUser = {
+      id: Date.now().toString(),
+      name,
+      email,
+      password, // In real app, this should be hashed
+      avatar: '/placeholder-user.jpg',
+      createdAt: new Date().toISOString()
+    };
+    
+    // Save to localStorage
+    registeredUsers.push(newUser);
+    localStorage.setItem('registered-users', JSON.stringify(registeredUsers));
+    
+    // Auto-login the new user
+    const userData = {
+      id: newUser.id,
+      name: newUser.name,
+      email: newUser.email,
+      avatar: newUser.avatar
+    };
+    setUser(userData);
+    localStorage.setItem('auth-user', JSON.stringify(userData));
+    
+    setIsLoading(false);
+    return true;
+  };
+
   const logout = () => {
     setUser(null);
     localStorage.removeItem('auth-user');
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, isLoading }}>
+    <AuthContext.Provider value={{ user, login, register, logout, isLoading }}>
       {children}
     </AuthContext.Provider>
   );

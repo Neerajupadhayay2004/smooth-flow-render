@@ -16,6 +16,7 @@ import Documents from "./pages/Documents";
 import Reports from "./pages/Reports";
 import ReturnAudit from "./pages/ReturnAudit";
 import Login from "./pages/Login";
+import SignUp from "./pages/SignUp";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -40,6 +41,7 @@ const AppRoutes = () => {
   return (
     <Routes>
       <Route path="/login" element={!user ? <Login /> : <Navigate to="/" />} />
+      <Route path="/signup" element={!user ? <SignUp /> : <Navigate to="/" />} />
       <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
       <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
       <Route path="/add-product" element={<ProtectedRoute><AddProduct /></ProtectedRoute>} />

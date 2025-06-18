@@ -5,9 +5,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuth } from '@/contexts/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
-import { Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock } from 'lucide-react';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -45,30 +45,39 @@ const Login = () => {
             <span className="text-white font-bold text-xl">M</span>
           </div>
           <CardTitle className="text-2xl">Sign in to MUN-C</CardTitle>
+          <p className="text-sm text-gray-600 dark:text-gray-400">
+            Welcome back! Please sign in to your account
+          </p>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="admin@mun-c.com"
-                required
-              />
+              <div className="relative">
+                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                <Input
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="admin@mun-c.com"
+                  className="pl-10"
+                  required
+                />
+              </div>
             </div>
             
             <div>
               <Label htmlFor="password">Password</Label>
               <div className="relative">
+                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                 <Input
                   id="password"
                   type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="admin123"
+                  className="pl-10 pr-10"
                   required
                 />
                 <Button
@@ -87,9 +96,17 @@ const Login = () => {
               {isLoading ? 'Signing in...' : 'Sign in'}
             </Button>
             
-            <p className="text-sm text-center text-gray-600 dark:text-gray-400">
-              Demo credentials: admin@mun-c.com / admin123
-            </p>
+            <div className="text-center space-y-2">
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                Don't have an account?{' '}
+                <Link to="/signup" className="text-blue-600 hover:underline">
+                  Sign up
+                </Link>
+              </p>
+              <p className="text-xs text-gray-500 dark:text-gray-500">
+                Demo credentials: admin@mun-c.com / admin123
+              </p>
+            </div>
           </form>
         </CardContent>
       </Card>
