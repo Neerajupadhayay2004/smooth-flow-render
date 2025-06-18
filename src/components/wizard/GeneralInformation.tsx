@@ -8,6 +8,7 @@ import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 import { BarChart, HelpCircle } from "lucide-react";
 import { ProductFormData } from "../ProductWizard";
+import { useState } from "react";
 
 interface GeneralInformationProps {
   formData: ProductFormData;
@@ -15,6 +16,8 @@ interface GeneralInformationProps {
 }
 
 const GeneralInformation = ({ formData, updateFormData }: GeneralInformationProps) => {
+  const [showAdvanced, setShowAdvanced] = useState(false);
+
   const generateBarcode = () => {
     const barcode = Math.random().toString(36).substring(2, 15);
     updateFormData({ barcode });
@@ -24,6 +27,19 @@ const GeneralInformation = ({ formData, updateFormData }: GeneralInformationProp
     const ean = Math.floor(Math.random() * 1000000000000).toString();
     updateFormData({ ean });
   };
+
+  const handleAdvanceToggle = (checked: boolean) => {
+    setShowAdvanced(checked);
+  };
+
+  // Check if current selection should show inventory fields
+  const showInventoryFields = formData.itemType === "goods";
+  
+  // Check if current selection should show variant fields
+  const showVariantFields = formData.productType === "variant";
+  
+  // Check if current selection should show bundle fields
+  const showBundleFields = formData.productType === "bundle";
 
   return (
     <div className="space-y-8">
@@ -71,48 +87,50 @@ const GeneralInformation = ({ formData, updateFormData }: GeneralInformationProp
         </div>
       </div>
 
-      {/* Barcode and EAN */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div>
-          <div className="flex items-center justify-between mb-2">
-            <Label htmlFor="barcode">Barcode</Label>
-            <Button
-              type="button"
-              variant="link"
-              className="text-blue-600 text-sm p-0 h-auto"
-              onClick={generateBarcode}
-            >
-              Generate Barcode
-            </Button>
+      {/* Barcode and EAN - Only for Goods */}
+      {showInventoryFields && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <Label htmlFor="barcode">Barcode</Label>
+              <Button
+                type="button"
+                variant="link"
+                className="text-blue-600 text-sm p-0 h-auto"
+                onClick={generateBarcode}
+              >
+                Generate Barcode
+              </Button>
+            </div>
+            <div className="flex gap-2">
+              <Input
+                id="barcode"
+                placeholder="Enter 12 Digit Code"
+                value={formData.barcode}
+                onChange={(e) => updateFormData({ barcode: e.target.value })}
+              />
+              <Button variant="outline" size="icon">
+                <BarChart className="w-4 h-4" />
+              </Button>
+            </div>
           </div>
-          <div className="flex gap-2">
-            <Input
-              id="barcode"
-              placeholder="Enter 12 Digit Code"
-              value={formData.barcode}
-              onChange={(e) => updateFormData({ barcode: e.target.value })}
-            />
-            <Button variant="outline" size="icon">
-              <BarChart className="w-4 h-4" />
-            </Button>
+          
+          <div>
+            <Label htmlFor="ean">EAN</Label>
+            <div className="flex gap-2">
+              <Input
+                id="ean"
+                placeholder="Enter 12 Digit Code"
+                value={formData.ean}
+                onChange={(e) => updateFormData({ ean: e.target.value })}
+              />
+              <Button variant="outline" size="icon">
+                <BarChart className="w-4 h-4" />
+              </Button>
+            </div>
           </div>
         </div>
-        
-        <div>
-          <Label htmlFor="ean">EAN</Label>
-          <div className="flex gap-2">
-            <Input
-              id="ean"
-              placeholder="Enter 12 Digit Code"
-              value={formData.ean}
-              onChange={(e) => updateFormData({ ean: e.target.value })}
-            />
-            <Button variant="outline" size="icon">
-              <BarChart className="w-4 h-4" />
-            </Button>
-          </div>
-        </div>
-      </div>
+      )}
 
       {/* Category and Sub-Category */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -123,10 +141,21 @@ const GeneralInformation = ({ formData, updateFormData }: GeneralInformationProp
               <SelectValue placeholder="Select Category" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="electronics">Electronics</SelectItem>
-              <SelectItem value="clothing">Clothing</SelectItem>
-              <SelectItem value="books">Books</SelectItem>
-              <SelectItem value="home">Home & Garden</SelectItem>
+              {formData.itemType === "goods" ? (
+                <>
+                  <SelectItem value="electronics">Electronics</SelectItem>
+                  <SelectItem value="clothing">Clothing</SelectItem>
+                  <SelectItem value="books">Books</SelectItem>
+                  <SelectItem value="home">Home & Garden</SelectItem>
+                </>
+              ) : (
+                <>
+                  <SelectItem value="consulting">Consulting</SelectItem>
+                  <SelectItem value="maintenance">Maintenance</SelectItem>
+                  <SelectItem value="training">Training</SelectItem>
+                  <SelectItem value="support">Support</SelectItem>
+                </>
+              )}
             </SelectContent>
           </Select>
         </div>
@@ -135,32 +164,44 @@ const GeneralInformation = ({ formData, updateFormData }: GeneralInformationProp
           <Label>Sub-Category</Label>
           <Select value={formData.subCategory} onValueChange={(value) => updateFormData({ subCategory: value })}>
             <SelectTrigger>
-              <SelectValue placeholder="Select Category" />
+              <SelectValue placeholder="Select Sub-Category" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="smartphones">Smartphones</SelectItem>
-              <SelectItem value="laptops">Laptops</SelectItem>
-              <SelectItem value="accessories">Accessories</SelectItem>
+              {formData.itemType === "goods" ? (
+                <>
+                  <SelectItem value="smartphones">Smartphones</SelectItem>
+                  <SelectItem value="laptops">Laptops</SelectItem>
+                  <SelectItem value="accessories">Accessories</SelectItem>
+                </>
+              ) : (
+                <>
+                  <SelectItem value="business">Business Consulting</SelectItem>
+                  <SelectItem value="technical">Technical Support</SelectItem>
+                  <SelectItem value="installation">Installation</SelectItem>
+                </>
+              )}
             </SelectContent>
           </Select>
         </div>
       </div>
 
-      {/* Brand/Manufacturer */}
-      <div>
-        <Label>Brand/Manufacturer</Label>
-        <Select value={formData.brand} onValueChange={(value) => updateFormData({ brand: value })}>
-          <SelectTrigger>
-            <SelectValue placeholder="Select Category" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="apple">Apple</SelectItem>
-            <SelectItem value="samsung">Samsung</SelectItem>
-            <SelectItem value="sony">Sony</SelectItem>
-            <SelectItem value="lg">LG</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
+      {/* Brand/Manufacturer - Only for Goods */}
+      {showInventoryFields && (
+        <div>
+          <Label>Brand/Manufacturer</Label>
+          <Select value={formData.brand} onValueChange={(value) => updateFormData({ brand: value })}>
+            <SelectTrigger>
+              <SelectValue placeholder="Select Brand" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="apple">Apple</SelectItem>
+              <SelectItem value="samsung">Samsung</SelectItem>
+              <SelectItem value="sony">Sony</SelectItem>
+              <SelectItem value="lg">LG</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      )}
 
       <Separator />
 
@@ -190,152 +231,244 @@ const GeneralInformation = ({ formData, updateFormData }: GeneralInformationProp
         </RadioGroup>
       </div>
 
-      {/* Supplier Information */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div>
-          <Label>Select Supplier</Label>
-          <Select value={formData.supplier} onValueChange={(value) => updateFormData({ supplier: value })}>
-            <SelectTrigger>
-              <SelectValue placeholder="Select Category" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="supplier1">Supplier 1</SelectItem>
-              <SelectItem value="supplier2">Supplier 2</SelectItem>
-              <SelectItem value="supplier3">Supplier 3</SelectItem>
-            </SelectContent>
-          </Select>
+      {/* Variant Information - Only show for Variant type */}
+      {showVariantFields && (
+        <div className="bg-blue-50 p-4 rounded-lg">
+          <Label className="text-base font-semibold mb-4 block">Variant Options</Label>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <Label>Color Options</Label>
+              <Input placeholder="Red, Blue, Green" />
+            </div>
+            <div>
+              <Label>Size Options</Label>
+              <Input placeholder="S, M, L, XL" />
+            </div>
+            <div>
+              <Label>Material Options</Label>
+              <Input placeholder="Cotton, Silk, Wool" />
+            </div>
+          </div>
         </div>
-        
-        <div>
-          <Label>Supplier SKU</Label>
-          <Select value={formData.supplierSku} onValueChange={(value) => updateFormData({ supplierSku: value })}>
-            <SelectTrigger>
-              <SelectValue placeholder="Select Category" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="sku1">SKU-001</SelectItem>
-              <SelectItem value="sku2">SKU-002</SelectItem>
-              <SelectItem value="sku3">SKU-003</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
+      )}
 
-      {/* Warehouse/Location */}
-      <div>
-        <Label>Warehouse/Location</Label>
-        <Select value={formData.warehouse} onValueChange={(value) => updateFormData({ warehouse: value })}>
-          <SelectTrigger>
-            <SelectValue placeholder="Select Category" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="warehouse1">Warehouse 1</SelectItem>
-            <SelectItem value="warehouse2">Warehouse 2</SelectItem>
-            <SelectItem value="warehouse3">Warehouse 3</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
+      {/* Bundle Information - Only show for Bundle type */}
+      {showBundleFields && (
+        <div className="bg-green-50 p-4 rounded-lg">
+          <Label className="text-base font-semibold mb-4 block">Bundle Products</Label>
+          <div className="space-y-4">
+            <div>
+              <Label>Bundle Items</Label>
+              <Input placeholder="Select products to include in bundle" />
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label>Bundle Discount (%)</Label>
+                <Input placeholder="10" type="number" />
+              </div>
+              <div>
+                <Label>Minimum Quantity</Label>
+                <Input placeholder="1" type="number" />
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Supplier Information - Only for Goods */}
+      {showInventoryFields && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <Label>Select Supplier</Label>
+            <Select value={formData.supplier} onValueChange={(value) => updateFormData({ supplier: value })}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select Supplier" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="supplier1">Supplier 1</SelectItem>
+                <SelectItem value="supplier2">Supplier 2</SelectItem>
+                <SelectItem value="supplier3">Supplier 3</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          
+          <div>
+            <Label>Supplier SKU</Label>
+            <Select value={formData.supplierSku} onValueChange={(value) => updateFormData({ supplierSku: value })}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select Supplier SKU" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="sku1">SKU-001</SelectItem>
+                <SelectItem value="sku2">SKU-002</SelectItem>
+                <SelectItem value="sku3">SKU-003</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+      )}
+
+      {/* Warehouse/Location - Only for Goods */}
+      {showInventoryFields && (
+        <div>
+          <Label>Warehouse/Location</Label>
+          <Select value={formData.warehouse} onValueChange={(value) => updateFormData({ warehouse: value })}>
+            <SelectTrigger>
+              <SelectValue placeholder="Select Warehouse" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="warehouse1">Main Warehouse</SelectItem>
+              <SelectItem value="warehouse2">Secondary Warehouse</SelectItem>
+              <SelectItem value="warehouse3">Regional Warehouse</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      )}
 
       <Separator />
 
       {/* Advanced Settings */}
       <div>
         <div className="flex items-center justify-between mb-6">
-          <Label className="text-base font-semibold">Advance</Label>
-          <Switch />
+          <Label className="text-base font-semibold">Advanced Settings</Label>
+          <Switch checked={showAdvanced} onCheckedChange={handleAdvanceToggle} />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div>
-            <div className="flex items-center gap-2 mb-2">
-              <Label>Lead Time</Label>
-              <HelpCircle className="w-4 h-4 text-gray-400" />
-            </div>
-            <Select value={formData.leadTime} onValueChange={(value) => updateFormData({ leadTime: value })}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select Category" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="1-week">1 Week</SelectItem>
-                <SelectItem value="2-weeks">2 Weeks</SelectItem>
-                <SelectItem value="1-month">1 Month</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+        {showAdvanced && (
+          <div className="space-y-6">
+            {/* Advanced fields for Goods */}
+            {showInventoryFields && (
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div>
+                    <div className="flex items-center gap-2 mb-2">
+                      <Label>Lead Time</Label>
+                      <HelpCircle className="w-4 h-4 text-gray-400" />
+                    </div>
+                    <Select value={formData.leadTime} onValueChange={(value) => updateFormData({ leadTime: value })}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select Lead Time" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="1-week">1 Week</SelectItem>
+                        <SelectItem value="2-weeks">2 Weeks</SelectItem>
+                        <SelectItem value="1-month">1 Month</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
 
-          <div>
-            <div className="flex items-center gap-2 mb-2">
-              <Label>Reorder Level</Label>
-              <HelpCircle className="w-4 h-4 text-gray-400" />
-            </div>
-            <Select value={formData.reorderLevel} onValueChange={(value) => updateFormData({ reorderLevel: value })}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select Category" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="10">10 units</SelectItem>
-                <SelectItem value="25">25 units</SelectItem>
-                <SelectItem value="50">50 units</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+                  <div>
+                    <div className="flex items-center gap-2 mb-2">
+                      <Label>Reorder Level</Label>
+                      <HelpCircle className="w-4 h-4 text-gray-400" />
+                    </div>
+                    <Select value={formData.reorderLevel} onValueChange={(value) => updateFormData({ reorderLevel: value })}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select Reorder Level" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="10">10 units</SelectItem>
+                        <SelectItem value="25">25 units</SelectItem>
+                        <SelectItem value="50">50 units</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
 
-          <div>
-            <div className="flex items-center gap-2 mb-2">
-              <Label>Initial Stock Quantity</Label>
-              <HelpCircle className="w-4 h-4 text-gray-400" />
-            </div>
-            <Input
-              placeholder="0.00"
-              value={formData.initialStock}
-              onChange={(e) => updateFormData({ initialStock: e.target.value })}
-            />
-          </div>
-        </div>
+                  <div>
+                    <div className="flex items-center gap-2 mb-2">
+                      <Label>Initial Stock Quantity</Label>
+                      <HelpCircle className="w-4 h-4 text-gray-400" />
+                    </div>
+                    <Input
+                      placeholder="0.00"
+                      value={formData.initialStock}
+                      onChange={(e) => updateFormData({ initialStock: e.target.value })}
+                    />
+                  </div>
+                </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-          <div>
-            <div className="flex items-center gap-2 mb-4">
-              <Label className="text-base font-semibold">Track</Label>
-              <HelpCircle className="w-4 h-4 text-gray-400" />
-            </div>
-            <RadioGroup
-              value={formData.track}
-              onValueChange={(value: "serial" | "batch") => updateFormData({ track: value })}
-              className="flex gap-6"
-            >
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="serial" id="serial" />
-                <Label htmlFor="serial">Serial No.</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="batch" id="batch" />
-                <Label htmlFor="batch">Batch No.</Label>
-              </div>
-            </RadioGroup>
-          </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <div className="flex items-center gap-2 mb-4">
+                      <Label className="text-base font-semibold">Track Inventory By</Label>
+                      <HelpCircle className="w-4 h-4 text-gray-400" />
+                    </div>
+                    <RadioGroup
+                      value={formData.track}
+                      onValueChange={(value: "serial" | "batch") => updateFormData({ track: value })}
+                      className="flex gap-6"
+                    >
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="serial" id="serial" />
+                        <Label htmlFor="serial">Serial No.</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="batch" id="batch" />
+                        <Label htmlFor="batch">Batch No.</Label>
+                      </div>
+                    </RadioGroup>
+                  </div>
 
-          <div>
-            <div className="flex items-center gap-2 mb-4">
-              <Label className="text-base font-semibold">Status</Label>
-              <HelpCircle className="w-4 h-4 text-gray-400" />
-            </div>
-            <RadioGroup
-              value={formData.status}
-              onValueChange={(value: "returnable" | "non-returnable") => updateFormData({ status: value })}
-              className="flex gap-6"
-            >
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="returnable" id="returnable" />
-                <Label htmlFor="returnable">Returnable</Label>
+                  <div>
+                    <div className="flex items-center gap-2 mb-4">
+                      <Label className="text-base font-semibold">Return Status</Label>
+                      <HelpCircle className="w-4 h-4 text-gray-400" />
+                    </div>
+                    <RadioGroup
+                      value={formData.status}
+                      onValueChange={(value: "returnable" | "non-returnable") => updateFormData({ status: value })}
+                      className="flex gap-6"
+                    >
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="returnable" id="returnable" />
+                        <Label htmlFor="returnable">Returnable</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="non-returnable" id="non-returnable" />
+                        <Label htmlFor="non-returnable">Non-returnable</Label>
+                      </div>
+                    </RadioGroup>
+                  </div>
+                </div>
+              </>
+            )}
+
+            {/* Advanced fields for Services */}
+            {!showInventoryFields && (
+              <div className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <Label>Service Duration</Label>
+                    <Select>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select Duration" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="1-hour">1 Hour</SelectItem>
+                        <SelectItem value="2-hours">2 Hours</SelectItem>
+                        <SelectItem value="half-day">Half Day</SelectItem>
+                        <SelectItem value="full-day">Full Day</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label>Service Type</Label>
+                    <Select>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select Type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="one-time">One Time</SelectItem>
+                        <SelectItem value="recurring">Recurring</SelectItem>
+                        <SelectItem value="subscription">Subscription</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
               </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="non-returnable" id="non-returnable" />
-                <Label htmlFor="non-returnable">Non-returnable</Label>
-              </div>
-            </RadioGroup>
+            )}
           </div>
-        </div>
+        )}
       </div>
     </div>
   );
