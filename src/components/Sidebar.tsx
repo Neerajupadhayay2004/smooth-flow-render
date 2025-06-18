@@ -54,16 +54,16 @@ const Sidebar = () => {
       <Button
         variant="ghost"
         size="icon"
-        className="md:hidden fixed top-4 left-4 z-50 bg-white dark:bg-gray-800 shadow-md"
+        className="lg:hidden fixed top-4 left-4 z-50 bg-white dark:bg-gray-800 shadow-md"
         onClick={() => setIsMobileOpen(!isMobileOpen)}
       >
-        {isMobileOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+        {isMobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
       </Button>
 
       {/* Mobile Overlay */}
       {isMobileOpen && (
         <div 
-          className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
+          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
           onClick={() => setIsMobileOpen(false)}
         />
       )}
@@ -71,24 +71,26 @@ const Sidebar = () => {
       {/* Sidebar */}
       <div className={cn(
         "bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 min-h-screen transition-all duration-300 z-40",
+        // Desktop and tablet sizing
         isCollapsed ? "w-16" : "w-64",
-        "fixed md:relative",
-        isMobileOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
+        // Mobile positioning
+        "fixed lg:relative",
+        isMobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
       )}>
         {/* Logo */}
-        <div className="p-4 md:p-6 border-b border-gray-200 dark:border-gray-700">
+        <div className="p-3 sm:p-4 lg:p-6 border-b border-gray-200 dark:border-gray-700">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm">M</span>
+            <div className="w-7 h-7 sm:w-8 sm:h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+              <span className="text-white font-bold text-xs sm:text-sm">M</span>
             </div>
             {!isCollapsed && (
-              <span className="font-bold text-lg md:text-xl text-gray-900 dark:text-white">MUN-C</span>
+              <span className="font-bold text-base sm:text-lg lg:text-xl text-gray-900 dark:text-white">MUN-C</span>
             )}
           </div>
         </div>
 
-        {/* Collapse Button - Hidden on Mobile */}
-        <div className="hidden md:block absolute -right-3 top-24">
+        {/* Collapse Button - Hidden on Mobile and Tablet */}
+        <div className="hidden xl:block absolute -right-3 top-24">
           <Button
             variant="outline"
             size="icon"
@@ -100,15 +102,15 @@ const Sidebar = () => {
         </div>
 
         {/* Navigation */}
-        <nav className="p-3 md:p-4 space-y-2">
+        <nav className="p-2 sm:p-3 lg:p-4 space-y-1 sm:space-y-2">
           {menuItems.map((item) => (
             <div key={item.label}>
               <Button
                 variant="ghost"
                 className={cn(
-                  "w-full justify-start text-left font-medium text-sm md:text-base",
+                  "w-full justify-start text-left font-medium text-xs sm:text-sm lg:text-base h-8 sm:h-9 lg:h-10",
                   isActivePath(item.path) && "bg-blue-50 dark:bg-blue-900/20 text-blue-600",
-                  isCollapsed && "px-2"
+                  isCollapsed ? "px-1 sm:px-2" : "px-2 sm:px-3"
                 )}
                 onClick={() => {
                   if (item.hasSubmenu && item.label === "Inventory") {
@@ -119,28 +121,28 @@ const Sidebar = () => {
                   }
                 }}
               >
-                <item.icon className="w-4 h-4 mr-3 flex-shrink-0" />
+                <item.icon className="w-3 h-3 sm:w-4 sm:h-4 mr-2 sm:mr-3 flex-shrink-0" />
                 {!isCollapsed && (
                   <>
-                    {item.label}
+                    <span className="truncate">{item.label}</span>
                     {item.hasSubmenu && (
                       inventoryOpen ? 
-                      <ChevronDown className="w-4 h-4 ml-auto" /> : 
-                      <ChevronRight className="w-4 h-4 ml-auto" />
+                      <ChevronDown className="w-3 h-3 sm:w-4 sm:h-4 ml-auto flex-shrink-0" /> : 
+                      <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4 ml-auto flex-shrink-0" />
                     )}
                   </>
                 )}
               </Button>
               
               {item.hasSubmenu && inventoryOpen && !isCollapsed && (
-                <div className="ml-7 mt-2 space-y-1">
+                <div className="ml-5 sm:ml-7 mt-1 sm:mt-2 space-y-1">
                   {item.submenu?.map((subItem) => (
                     <Button
                       key={subItem.label}
                       variant="ghost"
                       size="sm"
                       className={cn(
-                        "w-full justify-start text-sm",
+                        "w-full justify-start text-xs sm:text-sm h-7 sm:h-8",
                         location.pathname === subItem.path && "bg-blue-50 dark:bg-blue-900/20 text-blue-600"
                       )}
                       onClick={() => {
@@ -148,7 +150,7 @@ const Sidebar = () => {
                         setIsMobileOpen(false);
                       }}
                     >
-                      {subItem.label}
+                      <span className="truncate">{subItem.label}</span>
                     </Button>
                   ))}
                 </div>

@@ -21,25 +21,25 @@ const SettingsPanel = ({ isOpen, onClose }: SettingsPanelProps) => {
   if (!isOpen) return null;
 
   return (
-    <div className="absolute top-full right-0 mt-2 w-80 z-50">
+    <div className="absolute top-full right-0 mt-2 w-72 sm:w-80 z-50">
       <Card className="dark:bg-gray-800 shadow-lg border">
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
-            <CardTitle className="text-lg">Settings</CardTitle>
+            <CardTitle className="text-base sm:text-lg">Settings</CardTitle>
             <Button size="sm" variant="ghost" onClick={onClose}>
               <X className="w-4 h-4" />
             </Button>
           </div>
         </CardHeader>
-        <CardContent className="space-y-6">
+        <CardContent className="space-y-4 sm:space-y-6 max-h-80 sm:max-h-96 overflow-y-auto">
           {/* Theme Settings */}
           <div>
-            <h4 className="font-medium mb-3">Appearance</h4>
+            <h4 className="font-medium mb-3 text-sm sm:text-base">Appearance</h4>
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <span className="text-sm">Theme</span>
                 <Select value={theme} onValueChange={setTheme}>
-                  <SelectTrigger className="w-32">
+                  <SelectTrigger className="w-24 sm:w-32">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -53,7 +53,7 @@ const SettingsPanel = ({ isOpen, onClose }: SettingsPanelProps) => {
 
           {/* Notification Settings */}
           <div>
-            <h4 className="font-medium mb-3">Notifications</h4>
+            <h4 className="font-medium mb-3 text-sm sm:text-base">Notifications</h4>
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <span className="text-sm">Push Notifications</span>
@@ -68,7 +68,7 @@ const SettingsPanel = ({ isOpen, onClose }: SettingsPanelProps) => {
 
           {/* System Settings */}
           <div>
-            <h4 className="font-medium mb-3">System</h4>
+            <h4 className="font-medium mb-3 text-sm sm:text-base">System</h4>
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <span className="text-sm">Auto Backup</span>
@@ -77,7 +77,7 @@ const SettingsPanel = ({ isOpen, onClose }: SettingsPanelProps) => {
               <div className="flex items-center justify-between">
                 <span className="text-sm">Language</span>
                 <Select defaultValue="en">
-                  <SelectTrigger className="w-24">
+                  <SelectTrigger className="w-16 sm:w-24">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -92,13 +92,13 @@ const SettingsPanel = ({ isOpen, onClose }: SettingsPanelProps) => {
 
           {/* Action Buttons */}
           <div className="pt-3 border-t space-y-2">
-            <Button variant="outline" className="w-full">
+            <Button variant="outline" className="w-full text-sm">
               Export Data
             </Button>
-            <Button variant="outline" className="w-full">
+            <Button variant="outline" className="w-full text-sm">
               Import Data
             </Button>
-            <Button variant="destructive" className="w-full">
+            <Button variant="destructive" className="w-full text-sm">
               Clear All Data
             </Button>
           </div>

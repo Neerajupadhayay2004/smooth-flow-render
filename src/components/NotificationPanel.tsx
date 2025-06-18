@@ -30,11 +30,11 @@ const NotificationPanel = ({ isOpen, onClose }: NotificationPanelProps) => {
   };
 
   return (
-    <div className="absolute top-full right-0 mt-2 w-80 z-50">
+    <div className="absolute top-full right-0 mt-2 w-72 sm:w-80 z-50">
       <Card className="dark:bg-gray-800 shadow-lg border">
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
-            <CardTitle className="text-lg">Notifications</CardTitle>
+            <CardTitle className="text-base sm:text-lg">Notifications</CardTitle>
             <div className="flex gap-2">
               <Button size="sm" variant="ghost" onClick={markAllAsRead}>
                 <CheckCheck className="w-4 h-4" />
@@ -45,9 +45,9 @@ const NotificationPanel = ({ isOpen, onClose }: NotificationPanelProps) => {
             </div>
           </div>
         </CardHeader>
-        <CardContent className="space-y-3 max-h-96 overflow-y-auto">
+        <CardContent className="space-y-3 max-h-80 sm:max-h-96 overflow-y-auto">
           {notifications.length === 0 ? (
-            <p className="text-center text-muted-foreground py-4">No notifications</p>
+            <p className="text-center text-muted-foreground py-4 text-sm">No notifications</p>
           ) : (
             notifications.map((notification) => (
               <div
@@ -61,14 +61,14 @@ const NotificationPanel = ({ isOpen, onClose }: NotificationPanelProps) => {
               >
                 <div className="flex items-start gap-3">
                   {getNotificationIcon(notification.type)}
-                  <div className="flex-1">
+                  <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between">
-                      <h4 className="font-medium text-sm">{notification.title}</h4>
+                      <h4 className="font-medium text-sm truncate pr-2">{notification.title}</h4>
                       {!notification.read && (
-                        <Badge className="bg-blue-600 text-white text-xs">New</Badge>
+                        <Badge className="bg-blue-600 text-white text-xs flex-shrink-0">New</Badge>
                       )}
                     </div>
-                    <p className="text-sm text-muted-foreground mt-1">{notification.message}</p>
+                    <p className="text-sm text-muted-foreground mt-1 line-clamp-2">{notification.message}</p>
                     <p className="text-xs text-muted-foreground mt-2">
                       {new Date(notification.timestamp).toLocaleString()}
                     </p>

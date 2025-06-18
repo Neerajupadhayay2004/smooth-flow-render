@@ -46,57 +46,66 @@ const Header = ({ title = "Dashboard", showAddButton = true, onAddClick }: Heade
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-4">
+    <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-3 sm:px-4 lg:px-6 py-3 sm:py-4">
       <div className="flex items-center justify-between">
         {/* Left Side - Logo and Title */}
-        <div className="flex items-center gap-6">
-          <div className="flex items-center gap-3">
-            <div className="bg-blue-600 text-white px-3 py-1 rounded-md font-bold text-lg">
+        <div className="flex items-center gap-2 sm:gap-4 lg:gap-6 min-w-0 flex-1">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="bg-blue-600 text-white px-2 sm:px-3 py-1 rounded-md font-bold text-sm sm:text-base lg:text-lg">
               MUN-C
             </div>
-            <h1 className="text-xl font-semibold text-gray-900 dark:text-white hidden sm:block">
+            <h1 className="text-base sm:text-lg lg:text-xl font-semibold text-gray-900 dark:text-white truncate">
               {title}
             </h1>
           </div>
         </div>
 
         {/* Center - Search Bar */}
-        <div className="flex-1 max-w-md mx-8 hidden md:block">
-          <div className="relative">
+        <div className="hidden md:flex flex-1 max-w-xs lg:max-w-md mx-4 lg:mx-8">
+          <div className="relative w-full">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
             <Input
               placeholder="Search..."
-              className="pl-10 bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600"
+              className="pl-10 bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600 text-sm"
             />
           </div>
         </div>
 
         {/* Right Side - Actions and Profile */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-1 sm:gap-2 lg:gap-4">
           {showAddButton && (
             <Button 
               onClick={handleAddProduct}
-              className="bg-blue-600 hover:bg-blue-700 text-white"
+              className="bg-blue-600 hover:bg-blue-700 text-white h-8 sm:h-9 lg:h-10 px-2 sm:px-3 lg:px-4 text-xs sm:text-sm"
             >
-              <Plus className="w-4 h-4 mr-2" />
+              <Plus className="w-3 h-3 sm:w-4 sm:h-4 sm:mr-2" />
               <span className="hidden sm:inline">Add Product</span>
             </Button>
           )}
+
+          {/* Mobile Search Button */}
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="md:hidden w-8 h-8 sm:w-9 sm:h-9"
+          >
+            <Search className="w-4 h-4" />
+          </Button>
 
           {/* Notifications */}
           <div className="relative">
             <Button 
               variant="ghost" 
               size="icon" 
-              className="relative"
+              className="relative w-8 h-8 sm:w-9 sm:h-9 lg:w-10 lg:h-10"
               onClick={() => {
                 setShowNotifications(!showNotifications);
                 setShowSettings(false);
               }}
             >
-              <Bell className="w-5 h-5" />
+              <Bell className="w-4 h-4 sm:w-5 sm:h-5" />
               {unreadCount > 0 && (
-                <Badge className="absolute -top-1 -right-1 w-5 h-5 flex items-center justify-center p-0 bg-red-500 text-white text-xs">
+                <Badge className="absolute -top-1 -right-1 w-4 h-4 sm:w-5 sm:h-5 flex items-center justify-center p-0 bg-red-500 text-white text-xs">
                   {unreadCount}
                 </Badge>
               )}
@@ -112,12 +121,13 @@ const Header = ({ title = "Dashboard", showAddButton = true, onAddClick }: Heade
             <Button 
               variant="ghost" 
               size="icon"
+              className="w-8 h-8 sm:w-9 sm:h-9 lg:w-10 lg:h-10"
               onClick={() => {
                 setShowSettings(!showSettings);
                 setShowNotifications(false);
               }}
             >
-              <Settings className="w-5 h-5" />
+              <Settings className="w-4 h-4 sm:w-5 sm:h-5" />
             </Button>
             <SettingsPanel 
               isOpen={showSettings} 
@@ -128,20 +138,20 @@ const Header = ({ title = "Dashboard", showAddButton = true, onAddClick }: Heade
           {/* User Profile Dropdown */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="relative h-10 w-10 rounded-full">
-                <Avatar className="h-10 w-10">
+              <Button variant="ghost" className="relative w-8 h-8 sm:w-9 sm:h-9 lg:w-10 lg:h-10 rounded-full">
+                <Avatar className="w-8 h-8 sm:w-9 sm:h-9 lg:w-10 lg:h-10">
                   <AvatarImage src={user?.avatar} alt={user?.name} />
-                  <AvatarFallback className="bg-blue-600 text-white">
-                    <User className="w-5 h-5" />
+                  <AvatarFallback className="bg-blue-600 text-white text-xs sm:text-sm">
+                    <User className="w-3 h-3 sm:w-4 sm:h-4 lg:w-5 lg:h-5" />
                   </AvatarFallback>
                 </Avatar>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56 bg-white dark:bg-gray-800" align="end" forceMount>
+            <DropdownMenuContent className="w-48 sm:w-56 bg-white dark:bg-gray-800" align="end" forceMount>
               <DropdownMenuLabel className="font-normal">
                 <div className="flex flex-col space-y-1">
-                  <p className="text-sm font-medium leading-none">{user?.name || 'User'}</p>
-                  <p className="text-xs leading-none text-muted-foreground">
+                  <p className="text-sm font-medium leading-none truncate">{user?.name || 'User'}</p>
+                  <p className="text-xs leading-none text-muted-foreground truncate">
                     {user?.email || 'user@example.com'}
                   </p>
                 </div>
